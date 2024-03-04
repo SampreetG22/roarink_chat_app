@@ -1,13 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  Alert,
-  TouchableOpacity,
-} from "react-native";
+import { ActivityIndicator, StyleSheet } from "react-native";
+import { View, Text, TextInput, Alert, TouchableOpacity } from "react-native";
 import { Fontisto, Entypo } from "@expo/vector-icons";
 import { auth } from "../config/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -15,15 +9,19 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 const LogInScreen = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false); // State variable for loading
   const navigator = useNavigation();
 
   const handleSignIn = async () => {
     if (email && password) {
+      setLoading(true); // Start loading
       try {
         await signInWithEmailAndPassword(auth, email, password);
       } catch (error) {
         console.error(error);
         Alert.alert("Error", "Invalid email or password");
+      } finally {
+        setLoading(false); // Stop loading
       }
     } else {
       Alert.alert("Error", "Please enter email and password");
@@ -55,8 +53,16 @@ const LogInScreen = () => {
         />
       </View>
       <Text style={styles.forgotPswrd}>Forgot Password?</Text>
-      <TouchableOpacity style={styles.button} onPress={handleSignIn}>
-        <Text style={styles.btnText}>LOGIN</Text>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleSignIn}
+        disabled={loading}
+      >
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.btnText}>LOGIN</Text>
+        )}
       </TouchableOpacity>
       <Text>
         Don't have an account?{" "}
@@ -72,6 +78,7 @@ const LogInScreen = () => {
 };
 
 export default LogInScreen;
+
 const styles = StyleSheet.create({
   container: {
     padding: 5,
@@ -110,6 +117,7 @@ const styles = StyleSheet.create({
     width: 390,
     marginTop: 30,
     marginBottom: 15,
+    alignItems: "center",
   },
   btnText: {
     color: "white",

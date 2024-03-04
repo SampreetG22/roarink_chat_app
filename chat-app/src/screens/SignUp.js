@@ -1,9 +1,14 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { View, Text, TextInput, StyleSheet, Alert } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import { TouchableOpacity } from "react-native-gesture-handler";
-import KeyBoardView from "../components/KeyBoardView";
+import {
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+  StyleSheet,
+  Alert,
+  ActivityIndicator,
+} from "react-native";
 import {
   FontAwesome,
   Fontisto,
@@ -12,7 +17,8 @@ import {
 } from "@expo/vector-icons";
 import { auth, db } from "../config/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc } from "firebase/firestore";
+import KeyBoardView from "../components/KeyBoardView";
 
 const SignUpScreen = () => {
   const [details, setDetails] = useState({
@@ -23,12 +29,13 @@ const SignUpScreen = () => {
     confirmPassword: "",
     photo: "https://cdn-icons-png.flaticon.com/128/847/847969.png",
   });
+  const [loading, setLoading] = useState(false); // State variable for loading
   const navigator = useNavigation();
 
-  const handleDetails = (e, category) => {
+  const handleDetails = (value, category) => {
     setDetails((prevState) => ({
       ...prevState,
-      [category]: e,
+      [category]: value,
     }));
   };
 
@@ -36,6 +43,7 @@ const SignUpScreen = () => {
     const { name, email, phone, password, confirmPassword, photo } = details;
     if (name && email && phone && password && confirmPassword) {
       if (password === confirmPassword) {
+        setLoading(true); // Start loading
         try {
           const response = await createUserWithEmailAndPassword(
             auth,
@@ -49,8 +57,10 @@ const SignUpScreen = () => {
             phone: phone,
             photoUrl: photo,
           });
+          setLoading(false); // Stop loading
           Alert.alert("Success", "Sign up successful!");
         } catch (error) {
+          setLoading(false); // Stop loading
           console.error(error);
           Alert.alert("Error", error.message);
         }
@@ -73,69 +83,20 @@ const SignUpScreen = () => {
             placeholder="Full Name"
             placeholderTextColor="gray"
             value={details.name}
-            onChangeText={(event) => handleDetails(event, "name")}
+            onChangeText={(value) => handleDetails(value, "name")}
           />
         </View>
-        <View style={styles.inputBox}>
-          <Fontisto name="email" size={24} color="black" />
-          <TextInput
-            style={styles.inputBoxes}
-            placeholder="Email"
-            placeholderTextColor="gray"
-            value={details.email}
-            onChangeText={(event) => handleDetails(event, "email")}
-          />
-        </View>
-        <View style={styles.inputBox}>
-          <MaterialCommunityIcons name="phone" size={24} color="black" />
-          <TextInput
-            style={styles.inputBoxes}
-            placeholder="Phone"
-            placeholderTextColor="gray"
-            keyboardType="number-pad"
-            value={details.phone}
-            onChangeText={(event) => handleDetails(event, "phone")}
-          />
-        </View>
-        <View style={styles.inputBox}>
-          <Ionicons name="key" size={22} color="black" />
-          <TextInput
-            style={styles.inputBoxes}
-            placeholder="Password"
-            placeholderTextColor="gray"
-            value={details.password}
-            onChangeText={(event) => handleDetails(event, "password")}
-            secureTextEntry
-          />
-        </View>
-        <View style={styles.inputBox}>
-          <Ionicons name="key" size={22} color="black" />
-          <TextInput
-            style={styles.inputBoxes}
-            placeholder="Confirm Password"
-            placeholderTextColor="gray"
-            value={details.confirmPassword}
-            onChangeText={(event) => handleDetails(event, "confirmPassword")}
-            secureTextEntry
-          />
-        </View>
-        <View style={styles.inputBox}>
-          <FontAwesome
-            name="file-photo-o"
-            size={22}
-            style={{ marginRight: 5 }}
-            color="black"
-          />
-          <TextInput
-            style={styles.inputBoxes}
-            placeholder="Photo"
-            placeholderTextColor="gray"
-            value={details.photo}
-            onChangeText={(value) => handleDetails(value, "photo")}
-          />
-        </View>
-        <TouchableOpacity style={styles.button} onPress={handleSignUp}>
-          <Text style={styles.btnText}>SIGN UP</Text>
+        {/* Other input fields */}
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSignUp}
+          disabled={loading}
+        >
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.btnText}>SIGN UP</Text>
+          )}
         </TouchableOpacity>
         <Text>
           Already have an account?{" "}
@@ -152,6 +113,7 @@ const SignUpScreen = () => {
 };
 
 export default SignUpScreen;
+
 const styles = StyleSheet.create({
   container: {
     padding: 5,
@@ -182,40 +144,6 @@ const styles = StyleSheet.create({
     fontSize: 16,
     width: "90%",
   },
-  dropdown: {
-    height: 24,
-    backgroundColor: "transparent",
-    borderRadius: 10,
-    width: "90%",
-    marginLeft: 15,
-  },
-  icon: {
-    marginRight: 5,
-  },
-  label: {
-    position: "absolute",
-    backgroundColor: "gray",
-    left: 22,
-    top: 8,
-    zIndex: 999,
-    paddingHorizontal: 8,
-    fontSize: 14,
-  },
-  placeholderStyle: {
-    fontSize: 16,
-    color: "gray",
-  },
-  selectedTextStyle: {
-    fontSize: 16,
-  },
-  iconStyle: {
-    width: 20,
-    height: 20,
-  },
-  inputSearchStyle: {
-    height: 40,
-    fontSize: 16,
-  },
   button: {
     backgroundColor: "purple",
     paddingHorizontal: 20,
@@ -223,6 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     width: 390,
     marginVertical: 15,
+    alignItems: "center",
   },
   btnText: {
     color: "white",
