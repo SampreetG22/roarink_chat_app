@@ -83,10 +83,67 @@ const SignUpScreen = () => {
             placeholder="Full Name"
             placeholderTextColor="gray"
             value={details.name}
-            onChangeText={(value) => handleDetails(value, "name")}
+            onChangeText={(event) => handleDetails(event, "name")}
           />
         </View>
-        {/* Other input fields */}
+        <View style={styles.inputBox}>
+          <Fontisto name="email" size={24} color="black" />
+          <TextInput
+            style={styles.inputBoxes}
+            placeholder="Email"
+            placeholderTextColor="gray"
+            value={details.email}
+            onChangeText={(event) => handleDetails(event, "email")}
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <MaterialCommunityIcons name="phone" size={24} color="black" />
+          <TextInput
+            style={styles.inputBoxes}
+            placeholder="Phone"
+            placeholderTextColor="gray"
+            keyboardType="number-pad"
+            value={details.phone}
+            onChangeText={(event) => handleDetails(event, "phone")}
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <Ionicons name="key" size={22} color="black" />
+          <TextInput
+            style={styles.inputBoxes}
+            placeholder="Password"
+            placeholderTextColor="gray"
+            value={details.password}
+            onChangeText={(event) => handleDetails(event, "password")}
+            secureTextEntry
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <Ionicons name="key" size={22} color="black" />
+          <TextInput
+            style={styles.inputBoxes}
+            placeholder="Confirm Password"
+            placeholderTextColor="gray"
+            value={details.confirmPassword}
+            onChangeText={(event) => handleDetails(event, "confirmPassword")}
+            secureTextEntry
+          />
+        </View>
+        <View style={styles.inputBox}>
+          <FontAwesome
+            name="file-photo-o"
+            size={22}
+            style={{ marginRight: 5 }}
+            color="black"
+          />
+          <TextInput
+            style={styles.inputBoxes}
+            placeholder="Photo"
+            placeholderTextColor="gray"
+            value={details.photo}
+            onChangeText={(value) => handleDetails(value, "photo")}
+          />
+        </View>
         <TouchableOpacity
           style={styles.button}
           onPress={handleSignUp}
